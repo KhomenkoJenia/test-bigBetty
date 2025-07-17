@@ -1,0 +1,299 @@
+/*Nothing */
+.career h2 {
+  color: rgb(255, 255, 255);
+  background-color: black;
+  margin: 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+.vhs-wrapper {
+  position: relative;
+
+  height: 80vh;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  filter: contrast(1.2) brightness(1.1);
+}
+
+.vhs-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.02) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 2;
+  pointer-events: none;
+  animation: flicker 0.15s infinite;
+}
+
+.space-tunnel {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  transform-style: preserve-3d;
+  perspective: 800px;
+  transform: translateZ(0);
+}
+
+.cube-frame {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid rgba(148, 0, 64, 0.015);
+  box-shadow: 0 0 20px rgba(168, 0, 67, 0.3), 0 0 60px rgba(204, 1, 75, 0.177);
+  animation: fly 3s linear infinite;
+  animation-fill-mode: both;
+  mix-blend-mode: screen;
+  filter: drop-shadow(2px 0 rgba(124, 0, 66, 0.45))
+    drop-shadow(-2px 0 rgba(165, 0, 66, 0.328));
+  opacity: 0;
+}
+
+.cube-frame:nth-child(1) {
+  animation-delay: 0s;
+}
+.cube-frame:nth-child(2) {
+  animation-delay: 0.4s;
+}
+.cube-frame:nth-child(3) {
+  animation-delay: 0.8s;
+}
+.cube-frame:nth-child(4) {
+  animation-delay: 1.2s;
+}
+.cube-frame:nth-child(5) {
+  animation-delay: 1.6s;
+}
+.cube-frame:nth-child(6) {
+  animation-delay: 2s;
+}
+.cube-frame:nth-child(7) {
+  animation-delay: 2.4s;
+}
+
+@keyframes fly {
+  0% {
+    transform: translateZ(600px) scale(0.1) rotate(0deg);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateZ(-800px) scale(2.5) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flicker {
+  0%,
+  100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.about-anima {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+}
+
+.roulette {
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.wheel img {
+  transition: transform 10s cubic-bezier(0.3, 1, 0.7, 1),
+    10s filter cubic-bezier(0.1, 1, 0.8, 1),
+    10s -webkit-filter cubic-bezier(0.1, 1, 0.8, 1);
+  will-change: transform;
+  border-radius: 50%;
+
+  max-width: 300px;
+  user-drag: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+
+.arrow {
+  position: absolute;
+  top: -8%;
+  left: 45%;
+  z-index: 50;
+}
+
+.spin {
+  cursor: pointer;
+  overflow: visible;
+}
+
+.heart-container {
+  --heart-color: #c1004d;
+  position: relative;
+  width: 30px;
+  height: 30px;
+  top: -5px;
+  transition: 0.3s;
+}
+
+.heart-container .checkbox {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  z-index: 20;
+  cursor: pointer;
+}
+
+.heart-container .svg-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.heart-container .svg-outline,
+.heart-container .svg-filled {
+  fill: var(--heart-color);
+  position: absolute;
+}
+
+.heart-container .svg-filled {
+  animation: keyframes-svg-filled 1s;
+  display: none;
+}
+
+.heart-container .svg-celebrate {
+  position: absolute;
+  animation: keyframes-svg-celebrate 0.5s;
+  animation-fill-mode: forwards;
+  display: none;
+  stroke: var(--heart-color);
+  fill: var(--heart-color);
+  stroke-width: 2px;
+}
+
+.heart-container .checkbox:checked ~ .svg-container .svg-filled {
+  display: block;
+}
+
+.heart-container .checkbox:checked ~ .svg-container .svg-celebrate {
+  display: block;
+}
+
+@keyframes keyframes-svg-filled {
+  0% {
+    transform: scale(0);
+  }
+
+  25% {
+    transform: scale(1.2);
+  }
+
+  50% {
+    transform: scale(1);
+    filter: brightness(1.5);
+  }
+}
+
+@keyframes keyframes-svg-celebrate {
+  0% {
+    transform: scale(0);
+  }
+
+  50% {
+    opacity: 1;
+    filter: brightness(1.5);
+  }
+
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+    display: none;
+  }
+}
+.spin-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.spin-start {
+  --glow-color: rgba(0, 0, 0, 0.417);
+  --glow-spread-color: rgba(150, 9, 51, 0.603);
+  --enhanced-glow-color: rgb(252, 178, 219);
+  --btn-color: rgba(129, 0, 60, 0.709);
+  border: 0.25em solid var(--glow-color);
+  padding: 1em 3em;
+  color: var(--glow-color);
+  font-size: 15px;
+  font-weight: bold;
+  background-color: var(--btn-color);
+  border-radius: 1em;
+  outline: none;
+  box-shadow: 0 0 1em 0.25em var(--glow-color),
+    0 0 4em 1em var(--glow-spread-color),
+    inset 0 0 0.75em 0.25em var(--glow-color);
+  text-shadow: 0 0 0.5em var(--glow-color);
+  position: relative;
+  transition: all 0.3s;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spin-start::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  top: 120%;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background-color: var(--glow-spread-color);
+  filter: blur(2em);
+  opacity: 0.7;
+  transform: perspective(1.5em) rotateX(35deg) scale(1, 0.6);
+}
+
+.spin-start:hover {
+  color: var(--btn-color);
+  background-color: var(--glow-color);
+  box-shadow: 0 0 1em 0.25em var(--glow-color),
+    0 0 4em 2em var(--glow-spread-color),
+    inset 0 0 0.75em 0.25em var(--glow-color);
+}
+
+.spin-start:active {
+  box-shadow: 0 0 0.6em 0.25em var(--glow-color),
+    0 0 2.5em 2em var(--glow-spread-color),
+    inset 0 0 0.5em 0.25em var(--glow-color);
+}

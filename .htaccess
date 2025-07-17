@@ -1,0 +1,19 @@
+RewriteEngine On
+RewriteBase /
+
+# Удаление лишних слэшей (если в исходном запросе встречается две и более подряд)
+RewriteCond %{THE_REQUEST} //+ [NC]
+RewriteRule ^(.*)$ https://bigbetty.io/$1 [R=301,L]
+
+# Редирект с www на non-www
+RewriteCond %{HTTP_HOST} ^www\.bigbetty\.io$ [NC]
+RewriteRule ^(.*)$ https://bigbetty.io/$1 [L,R=301]
+
+# Редирект с http на https (если HTTPS не включён)
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://bigbetty.io/$1 [L,R=301]
+
+# Редирект index.html на корень
+RewriteRule ^index\.html$ https://bigbetty.io/ [L,R=301]
+
+ErrorDocument 404 /404/
