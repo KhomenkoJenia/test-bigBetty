@@ -98,3 +98,44 @@ var whyWeAreSwiper = new Swiper(".why-we-are-slider", {
     disableOnInteraction: true,
   },
 });
+
+// Керування швидкістю анімації по клику на .hero__main_image
+document.addEventListener("DOMContentLoaded", function () {
+  const heroMainImage = document.querySelector(".hero__main_image");
+  const animatedPattern = document.querySelector(".main-image-bg-hero");
+
+  if (heroMainImage && animatedPattern) {
+    // Стан: 0 - повільна (за замовчуванням), 1 - середня, 2 - швидка, 3 - зупинка
+    let currentSpeed = 0;
+
+    heroMainImage.addEventListener("click", function () {
+      // Видаляємо всі класи швидкості
+      animatedPattern.classList.remove(
+        "speed-medium",
+        "speed-fast",
+        "speed-stop"
+      );
+
+      // Змінюємо швидкість за циклом
+      currentSpeed = (currentSpeed + 1) % 4;
+
+      // Додаємо відповідний клас
+      if (currentSpeed === 1) {
+        animatedPattern.classList.add("speed-medium");
+      } else if (currentSpeed === 2) {
+        animatedPattern.classList.add("speed-fast");
+      } else if (currentSpeed === 3) {
+        animatedPattern.classList.add("speed-stop");
+      }
+      // currentSpeed === 0 - повертається до замовчування (без додаткових класів)
+    });
+  }
+});
+
+window.addEventListener("load", function () {
+  const loader = document.getElementById("preloader");
+  loader.style.opacity = "0";
+  setTimeout(() => {
+    loader.style.display = "none";
+  }, 500);
+});

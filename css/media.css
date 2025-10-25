@@ -37,20 +37,20 @@
     align-items: center;
     justify-content: center;
   }
+
   .hero__content__box__mobile .brands__button {
+    color: #48001e;
+    padding: 10px 20px;
     background-color: #fff;
     max-width: 224px;
     margin-top: 23px;
-  }
-  .hero__content__box__mobile .brands__button a {
-    color: #48001e;
-
     text-align: center;
     font-family: "Montserrat Alternates";
     font-size: 14px;
     font-style: normal;
     font-weight: 700;
     line-height: 16px;
+    justify-content: center;
   }
   .hero__content h1 {
     color: #fff;
@@ -207,6 +207,7 @@
     padding: 34px 14px;
   }
   .contant-event .event__logo {
+    width: 400px;
     max-width: 100%;
   }
   .contant-event .event__button {
@@ -397,6 +398,7 @@
   .brands__button.button__testimonials {
     max-width: 224px;
     margin: 24px auto 20px auto;
+    justify-content: center;
   }
   .our-blog .brands__button {
     max-width: 224px;
@@ -479,7 +481,10 @@
   }
   .title-event {
     margin-bottom: 0px;
-    text-align: center;
+    text-align: start;
+  }
+  .mt-10 {
+    margin-top: 10px;
   }
   .subtitle-blog {
     margin-top: 10px;
@@ -701,12 +706,11 @@
   }
   .contant-event .brand-img-absolute-main-event {
     height: 167px;
-    width: 320px;
-    margin: 0 auto;
+    width: 100%;
   }
   .main-event-box .brands-img {
     position: relative;
-    max-width: 320px;
+    max-width: 100%;
     margin: 0 auto;
   }
 
@@ -716,10 +720,8 @@
     padding: 22px 16px;
     max-width: 100%;
   }
-  .margin-mobile-centre {
-    margin: 0 auto;
-  }
-  .contant-event .brands-head img {
+
+  .contant-event .brands-head svg {
     display: none;
   }
   .contant-event h3 {
@@ -856,8 +858,12 @@
     margin-right: 10px;
   }
   .swiper-container.events__swiper.swiper-initialized.swiper-horizontal.swiper-backface-hidden {
-    transform: translate(14px, 0);
-    width: 327px;
+    width: 350px;
+    max-width: 100%;
+  }
+  .events .event__col {
+    width: 340px;
+    max-width: 100%;
   }
   .events .events__buttons {
     gap: 12px;
@@ -879,6 +885,10 @@
   }
   .galery .title {
     margin-bottom: 24px;
+  }
+  .events .event__logo {
+    width: 350px;
+    max-width: 100%;
   }
   .galery {
     padding: 44px 0;
@@ -1175,253 +1185,296 @@
     background-repeat: no-repeat;
     background-size: contain;
   }
-}
-@media only screen and (min-width: 769px) and (max-width: 1150px) {
-  .page404 .container {
-    justify-content: flex-start;
+  .events p {
+    font-size: 12px;
+
+    margin-bottom: 24px;
   }
-  .page404 {
-    background-position: center;
+  .main-event .container__row.brands-block__rows {
+    gap: 0;
   }
-}
-@media only screen and (min-width: 1024px) and (max-width: 1200px) {
-  .brand-image {
-    max-width: 150px;
-  }
-  body {
-    font-size: 14px;
+  .new-blog-page.blog-item-section .blog__col {
+    background-color: transparent;
   }
 
-  .hero__back-white {
-    display: none;
-  }
-  .brand__wrapper img {
-    width: 180px;
-  }
-  .hero__text {
-    width: 250px;
-  }
-  .hero__tower {
-    width: 150px;
-    left: 0;
-  }
-  .hero__london {
-    width: 60px;
-    bottom: 30%;
-    left: 12%;
-    z-index: 5;
-  }
-  .hero__box {
-    bottom: 31%;
-    left: 19%;
-  }
-  .hero__women {
-    width: 280px;
-  }
-}
-@media only screen and (min-width: 320px) and (max-width: 495px) {
-  .hero__img-line {
-    width: 100%;
-    display: block;
-    position: absolute;
-    top: -51px;
-    left: 0;
-  }
-  .container__menu {
-    padding: 8px 12px;
-  }
-
-  .form__submit {
-    width: 100%;
-    max-width: 224px;
-    margin: 0 auto;
-  }
-  .brands__button {
-    width: 100%;
-    max-width: 400px;
-  }
-}
-@media only screen and (min-width: 768px) and (max-width: 1023px) {
-  .brand_width {
-    width: 100%;
-  }
-
-  .hero__banner_mob {
-    display: none;
-  }
-  body {
-    font-stretch: 14px;
-  }
-  .hero__back-white {
-    display: none;
-  }
-  .hero__women {
-    width: 246px;
-  }
-  .hero__content div {
-    padding: 20px;
-  }
-  .hero__mobile {
-    position: relative;
-    display: block;
-    background: #f3efe4;
-    padding: 50px 20px;
-    max-width: 430px;
-    margin: 0 auto;
-    display: none;
-  }
-  .hero__pict .hero__london,
-  .hero__pict .hero__box,
-  .hero__pict .hero__tower,
-  .hero__pict .hero__text {
-    display: none;
-  }
-  .hero__tower {
-    width: 120px;
-    bottom: 0;
-    right: 5%;
-    z-index: 5;
-    position: absolute;
-    left: inherit;
-  }
-  .hero__box {
-    left: 0;
-    position: relative;
-    margin-top: 50px;
-  }
-
-  .event-container {
-    padding: 31px 17px;
-  }
-}
-@media only screen and (min-width: 320px) and (max-width: 1024px) {
-  .form__image {
-    display: none;
-  }
-  .container__col_form {
-    position: relative;
-    bottom: 20px;
-  }
-  .hero__desc_logo {
-    display: none;
-  }
-
-  .events .container {
-    padding-top: 0px;
-  }
-  .container__row_brand {
-    flex-wrap: wrap;
-  }
-  .brand_width:nth-of-type(2n) {
-    max-width: 320px;
-    margin: 0 auto;
-  }
-}
-@media only screen and (min-width: 320px) and (max-width: 1385px) {
-  .events__bottom {
-    display: flex;
+  /* secrete*/
+  .secret-block {
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    padding-bottom: 0px;
+    gap: 5px;
+    padding: 11px 17px 9px 16px;
   }
-  .events__bottom-m {
-    display: flex;
-    flex-direction: row;
-    flex-direction: row;
-    width: 100%;
-    justify-content: space-between;
+  .secret-block img {
+    width: 21px;
   }
-  .events__logo-name {
-    line-height: 1;
+  .secret-containt div {
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 800;
+    line-height: 17.787px;
   }
-  .events__wrap .events__row {
-    padding-top: 5px;
-  }
-  .container.vacance {
-    padding: 16px;
-  }
-  .vacance__titele h1 {
-    font-size: 28px;
-    line-height: 32px;
+  .brand_width.shadow-secret::before {
+    font-size: 16px;
 
-    margin-bottom: 18px;
-  }
-  .vacance__titele .job__box__info__col {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding-bottom: 32px;
-  }
-  .vacance__titele .job__box__info__col div,
-  .vacance__titele .job__box__info__col span {
-    font-size: 13px;
-    line-height: 24px;
-  }
-  .vacance__titele {
-    margin-bottom: 32px;
-  }
-  .vacance__contant h3 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-}
-@media only screen and (min-width: 769px) and (max-width: 1200px) {
-  .event__col {
-    width: 340px;
+    opacity: 0.8;
+    letter-spacing: 0.08em;
   }
 
-  .event__row {
-    justify-content: center;
-  }
-}
-@media only screen and (min-width: 769px) and (max-width: 1186px) {
-  .events__wrap_1 {
-    height: auto;
-  }
-  .events__col:nth-of-type(2n) {
-    padding-right: 10px;
-  }
-  .events__bottom {
-    width: 100%;
-    flex-direction: row;
-  }
-
-  .brands-mob {
-    display: block;
-  }
-  .brands__swiper-slide {
-    justify-content: center;
-    display: flex;
-  }
-  .brand_width {
-    margin-top: 0px;
-  }
-  .brands-mob .container {
-    padding: 30px 20px 15px;
-  }
-  .brand-swiper {
-    max-width: 450px;
-  }
-  .brand_width {
-    width: 300px;
-  }
-}
-
-@media only screen and (max-width: 1110px) {
-  .news-main-tab {
+  .hero__decor_image,
+  .hero__main_image,
+  .main-image-bg-hero {
     display: none;
   }
-}
-@media only screen and (min-width: 415px) and (max-width: 460px) {
-  .page404 {
-    background-position-y: -111px;
-    height: 85vh;
+  @media only screen and (min-width: 769px) and (max-width: 1150px) {
+    .page404 .container {
+      justify-content: flex-start;
+    }
+    .page404 {
+      background-position: center;
+    }
   }
-}
-@media only screen and (min-width: 460px) and (max-width: 700px) {
-  .page404 {
-    background-position-y: -138px;
-    height: 87vh;
+  @media only screen and (min-width: 1024px) and (max-width: 1200px) {
+    .brand-image {
+      max-width: 150px;
+    }
+    body {
+      font-size: 14px;
+    }
+
+    .hero__back-white {
+      display: none;
+    }
+    .brand__wrapper img {
+      width: 180px;
+    }
+    .hero__text {
+      width: 250px;
+    }
+    .hero__tower {
+      width: 150px;
+      left: 0;
+    }
+    .hero__london {
+      width: 60px;
+      bottom: 30%;
+      left: 12%;
+      z-index: 5;
+    }
+    .hero__box {
+      bottom: 31%;
+      left: 19%;
+    }
+    .hero__women {
+      width: 280px;
+    }
+  }
+  @media only screen and (min-width: 320px) and (max-width: 495px) {
+    .hero__img-line {
+      width: 100%;
+      display: block;
+      position: absolute;
+      top: -51px;
+      left: 0;
+    }
+    .container__menu {
+      padding: 8px 12px;
+    }
+
+    .form__submit {
+      width: 100%;
+      max-width: 224px;
+      margin: 0 auto;
+    }
+    .brands__button {
+      width: 100%;
+      max-width: 400px;
+    }
+  }
+  @media only screen and (min-width: 768px) and (max-width: 1023px) {
+    .brand_width {
+      width: 100%;
+    }
+
+    .hero__banner_mob {
+      display: none;
+    }
+    body {
+      font-stretch: 14px;
+    }
+    .hero__back-white {
+      display: none;
+    }
+    .hero__women {
+      width: 246px;
+    }
+    .hero__content div {
+      padding: 20px;
+    }
+    .hero__mobile {
+      position: relative;
+      display: block;
+      background: #f3efe4;
+      padding: 50px 20px;
+      max-width: 430px;
+      margin: 0 auto;
+      display: none;
+    }
+    .hero__pict .hero__london,
+    .hero__pict .hero__box,
+    .hero__pict .hero__tower,
+    .hero__pict .hero__text {
+      display: none;
+    }
+    .hero__tower {
+      width: 120px;
+      bottom: 0;
+      right: 5%;
+      z-index: 5;
+      position: absolute;
+      left: inherit;
+    }
+    .hero__box {
+      left: 0;
+      position: relative;
+      margin-top: 50px;
+    }
+
+    .event-container {
+      padding: 31px 17px;
+    }
+  }
+  @media only screen and (min-width: 320px) and (max-width: 1024px) {
+    .form__image {
+      display: none;
+    }
+    .container__col_form {
+      position: relative;
+      bottom: 20px;
+    }
+    .hero__desc_logo {
+      display: none;
+    }
+
+    .events .container {
+      padding-top: 0px;
+    }
+    .container__row_brand {
+      flex-wrap: wrap;
+    }
+    .brand_width:nth-of-type(2n) {
+      max-width: 320px;
+      margin: 0 auto;
+    }
+  }
+  @media only screen and (min-width: 320px) and (max-width: 1385px) {
+    .events__bottom {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 0px;
+    }
+    .events__bottom-m {
+      display: flex;
+      flex-direction: row;
+      flex-direction: row;
+      width: 100%;
+      justify-content: space-between;
+    }
+    .events__logo-name {
+      line-height: 1;
+    }
+    .events__wrap .events__row {
+      padding-top: 5px;
+    }
+    .container.vacance {
+      padding: 16px;
+    }
+    .vacance__titele h1 {
+      font-size: 28px;
+      line-height: 32px;
+
+      margin-bottom: 18px;
+    }
+    .vacance__titele .job__box__info__col {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding-bottom: 32px;
+    }
+    .vacance__titele .job__box__info__col div,
+    .vacance__titele .job__box__info__col span {
+      font-size: 13px;
+      line-height: 24px;
+    }
+    .vacance__titele {
+      margin-bottom: 32px;
+    }
+    .vacance__contant h3 {
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    .desc-on {
+      display: none;
+    }
+  }
+  @media only screen and (min-width: 769px) and (max-width: 1200px) {
+    .event__col {
+      width: 340px;
+    }
+
+    .event__row {
+      justify-content: center;
+    }
+  }
+  @media only screen and (min-width: 769px) and (max-width: 1186px) {
+    .events__wrap_1 {
+      height: auto;
+    }
+    .events__col:nth-of-type(2n) {
+      padding-right: 10px;
+    }
+    .events__bottom {
+      width: 100%;
+      flex-direction: row;
+    }
+
+    .brands-mob {
+      display: block;
+    }
+    .brands__swiper-slide {
+      justify-content: center;
+      display: flex;
+    }
+    .brand_width {
+      margin-top: 0px;
+    }
+    .brands-mob .container {
+      padding: 30px 20px 15px;
+    }
+    .brand-swiper {
+      max-width: 450px;
+    }
+    .brand_width {
+      width: 300px;
+    }
+  }
+
+  @media only screen and (max-width: 1110px) {
+    .news-main-tab {
+      display: none;
+    }
+  }
+  @media only screen and (min-width: 415px) and (max-width: 460px) {
+    .page404 {
+      background-position-y: -111px;
+      height: 85vh;
+    }
+  }
+  @media only screen and (min-width: 460px) and (max-width: 700px) {
+    .page404 {
+      background-position-y: -138px;
+      height: 87vh;
+    }
   }
 }
