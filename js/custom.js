@@ -99,35 +99,24 @@ var whyWeAreSwiper = new Swiper(".why-we-are-slider", {
   },
 });
 
-// Керування швидкістю анімації по клику на .hero__main_image
+// Керування анімацією по кліку на .hero__main_image
 document.addEventListener("DOMContentLoaded", function () {
   const heroMainImage = document.querySelector(".hero__main_image");
   const animatedPattern = document.querySelector(".main-image-bg-hero");
 
   if (heroMainImage && animatedPattern) {
-    // Стан: 0 - повільна (за замовчуванням), 1 - середня, 2 - швидка, 3 - зупинка
-    let currentSpeed = 0;
+    let isStopped = false;
 
     heroMainImage.addEventListener("click", function () {
-      // Видаляємо всі класи швидкості
-      animatedPattern.classList.remove(
-        "speed-medium",
-        "speed-fast",
-        "speed-stop"
-      );
-
-      // Змінюємо швидкість за циклом
-      currentSpeed = (currentSpeed + 1) % 4;
-
-      // Додаємо відповідний клас
-      if (currentSpeed === 1) {
-        animatedPattern.classList.add("speed-medium");
-      } else if (currentSpeed === 2) {
-        animatedPattern.classList.add("speed-fast");
-      } else if (currentSpeed === 3) {
+      if (isStopped) {
+        // Відновити анімацію (видалити клас зупинки)
+        animatedPattern.classList.remove("speed-stop");
+        isStopped = false;
+      } else {
+        // Зупинити анімацію
         animatedPattern.classList.add("speed-stop");
+        isStopped = true;
       }
-      // currentSpeed === 0 - повертається до замовчування (без додаткових класів)
     });
   }
 });

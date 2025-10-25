@@ -1863,6 +1863,15 @@ input[type="file"] {
   }
 }
 
+@keyframes rot-reverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
 /* event new */
 
 .event-container {
@@ -3483,16 +3492,6 @@ label.custom-checkbox a {
 .animated-pattern {
   animation: 13s linear 0s normal none infinite running rot;
   -webkit-animation: 13s linear 0s normal none infinite running rot;
-}
-
-.animated-pattern.speed-medium {
-  animation: 10s linear 0s normal none infinite running rot;
-  -webkit-animation: 10s linear 0s normal none infinite running rot;
-}
-
-.animated-pattern.speed-fast {
-  animation: 7s linear 0s normal none infinite running rot;
-  -webkit-animation: 7s linear 0s normal none infinite running rot;
 }
 
 .animated-pattern.speed-stop {
