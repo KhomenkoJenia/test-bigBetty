@@ -319,6 +319,7 @@
       <div class="hero__container">
         <img class="hero__decor_image" src="./img/bg-decor.svg" alt="">
         <img class="hero__main_image" src="./img/main-hero.png" alt="">
+        <div id="space-circle"></div>
         <div class="hero__content">
           <div class="hero__content__box">
             <img class="hero__mob_logo" src="./img/logo.svg" alt="Logo" />
@@ -1327,7 +1328,7 @@
 
   <div id="preloader">
     <img src="img/logo.svg" alt="Loading..." />
-  </div>
+        </div>
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
@@ -1361,91 +1362,668 @@
     });
   </script>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-  const modal = document.querySelector('.modal');
-  const tabLogin = document.querySelector('.tab-login');
-  const tabSignup = document.querySelector('.tab-signup');
-  const formLogin = document.querySelector('.form-login');
-  const formSignup = document.querySelector('.form-signup');
-  const forgotLink = document.querySelector('.forgot-link');
-  const switchToSignupLink = document.querySelector('.switch-to-signup');
-  const switchToLoginLink = document.querySelector('.switch-to-login');
-  const closeModalBtn = document.getElementById('closeMainModal');
-
-  const forgotOverlay = document.getElementById('forgotOverlay');
-  const closeForgotBtn = document.getElementById('closeForgot');
-
-  function openModal(tabName) {
-    modal.classList.remove('hidden');
-    document.body.classList.add('no-scroll');
-
-    if (tabName === 'login') {
-      tabLogin.classList.add('active');
-      tabSignup.classList.remove('active');
-      formLogin.classList.add('active');
-      formSignup.classList.remove('active');
-    } else if (tabName === 'signup') {
-      tabSignup.classList.add('active');
-      tabLogin.classList.remove('active');
-      formSignup.classList.add('active');
-      formLogin.classList.remove('active');
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.161.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.161.0/examples/jsm/"
     }
   }
+</script>
 
-  function closeModal() {
-    modal.classList.add('hidden');
-    document.body.classList.remove('no-scroll');
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+  const container = document.getElementById("space-circle");
+  const renderer = new THREE.WebGLRenderer({
+    alpha: true,
+    antialias: true,
+    powerPreference: "high-performance",
+  });
+  renderer.setClearColor(0x000000, 0);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(
+    45,
+    container.clientWidth / container.clientHeight,
+    0.1,
+    3000
+  );
+  camera.position.set(0, 0, 220);
+
+  // Бардове освітлення під стиль сайта
+  scene.add(new THREE.AmbientLight(0x996677, 1.0));
+  const dir1 = new THREE.DirectionalLight(0x610028, 1.5);
+  dir1.position.set(60, 40, 20);
+  scene.add(dir1);
+  const dir2 = new THREE.DirectionalLight(0x7e0134, 0.8);
+  dir2.position.set(-60, -40, -20);
+  scene.add(dir2);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enablePan = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 1.2;
+  controls.minDistance = 120;
+  controls.maxDistance = 320;
+
+  const loader = new THREE.TextureLoader();
+  const [flare1, flare2, flare3] = await Promise.all([
+    loader.loadAsync("https://i.ibb.co/TRsJ1tm/p1.png"),
+    loader.loadAsync("https://i.ibb.co/YQcTCRG/p2.png"),
+    loader.loadAsync("https://i.ibb.co/v1S8YW7/p7.png"),
+  ]);
+  [flare1, flare2, flare3].forEach((t) => (t.colorSpace = THREE.SRGBColorSpace));
+
+  // Темний фон з бардовим відтінком
+  const skyRadius = 200;
+  const sky = new THREE.Mesh(
+    new THREE.SphereGeometry(skyRadius, 48, 48),
+    new THREE.MeshBasicMaterial({ 
+      color: 0x2a0014,
+      side: THREE.BackSide 
+    })
+  );
+  scene.add(sky);
+
+  // Функція для створення карток у бардових кольорах
+  function makeCard({ color, position = [0, 0, 0], rotation = [0, 0, 0], showText = false, scale = [1, 1, 1] }) {
+    const group = new THREE.Group();
+    
+    // Основна форма карти (прямокутник)
+    const cardGeo = new THREE.BoxGeometry(10, 14, 0.5);
+    const cardMat = new THREE.MeshStandardMaterial({
+      color: color,
+      roughness: 0.3,
+      metalness: 0.5,
+      emissive: color,
+      emissiveIntensity: 0.2,
+    });
+    const card = new THREE.Mesh(cardGeo, cardMat);
+    group.add(card);
+    
+    // Масштабування карти
+    group.scale.set(...scale);
+    
+    // Додаємо білу рамку
+    const edgeGeo = new THREE.EdgesGeometry(cardGeo);
+    const edgeMat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 2 });
+    const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+    card.add(edges);
+    
+    // Додаємо текст "BIG BETTY" на всіх картах
+    const textCanvas = document.createElement('canvas');
+    const context = textCanvas.getContext('2d');
+    textCanvas.width = 512;
+    textCanvas.height = 512;
+    
+    // Фон для тексту прозорий
+    context.clearRect(0, 0, 512, 512);
+    
+    // Додаємо тінь для кращої видимості
+    context.fillStyle = '#000000';
+    const fontSize = showText ? 80 : 60; // Більший шрифт для центральної
+    context.font = `bold ${fontSize}px Arial`;
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    const yPos1 = showText ? 185 : 200;
+    const yPos2 = showText ? 285 : 290;
+    context.fillText('BIG', 260, yPos1);
+    context.fillText('BETTY', 260, yPos2);
+    
+    // Білий текст
+    context.fillStyle = '#ffffff';
+    context.fillText('BIG', showText ? 258 : 259, showText ? 183 : 199);
+    context.fillText('BETTY', showText ? 258 : 259, showText ? 283 : 289);
+    
+    const textTexture = new THREE.CanvasTexture(textCanvas);
+    textTexture.needsUpdate = true;
+    const textMaterial = new THREE.MeshBasicMaterial({
+      map: textTexture,
+      transparent: true,
+      side: THREE.DoubleSide,
+      opacity: 0.9,
+    });
+    const textGeometry = new THREE.PlaneGeometry(8, 8);
+    const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    textMesh.position.z = 0.28;
+    group.add(textMesh);
+    
+    // Додаємо текст на зворотний бік
+    const backTextMesh = new THREE.Mesh(textGeometry, textMaterial.clone());
+    backTextMesh.position.z = -0.28;
+    backTextMesh.rotation.y = Math.PI; // Повертаємо на 180 градусів
+    group.add(backTextMesh);
+    
+    group.position.set(...position);
+    group.rotation.set(...rotation);
+    scene.add(group);
+    return group;
   }
-
- 
-  document.querySelectorAll('.open-login-tab').forEach(btn => {
-    btn.addEventListener('click', () => openModal('login'));
-  });
-
-  document.querySelectorAll('.open-signup-tab').forEach(btn => {
-    btn.addEventListener('click', () => openModal('signup'));
-  });
-
-
-  tabLogin.addEventListener('click', () => openModal('login'));
-  tabSignup.addEventListener('click', () => openModal('signup'));
-
-
-  closeModalBtn.addEventListener('click', closeModal);
-
-
-  forgotLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    modal.classList.add('hidden');
-    forgotOverlay.classList.remove('hidden');
-    document.body.classList.add('no-scroll');
-  });
-
-  switchToSignupLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    openModal('signup');
-  });
-
-  switchToLoginLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    openModal('login');
-  });
-
- 
-  closeForgotBtn.addEventListener('click', () => {
-    forgotOverlay.classList.add('hidden');
-    document.body.classList.remove('no-scroll');
-  });
-
   
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      closeModal();
-    }
-  });
-});
+  // Функція для створення ефекту свічення навколо картки
+  function addGlowEffect(card, color, intensity = 0.3) {
+    const glowGeometry = new THREE.SphereGeometry(20, 32, 32);
+    const glowMaterial = new THREE.MeshBasicMaterial({
+      color: color,
+      transparent: true,
+      opacity: intensity,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+    });
+    const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+    card.add(glow);
+    return glow;
+  }
 
+  // Центральна картка з текстом "BIG BETTY" - чорна і збільшена вдвічі
+  const centerCard = makeCard({
+    color: 0x000000, // Чорна
+    position: [0, 0, 0],
+    rotation: [0, 0, 0],
+    showText: true,
+    scale: [3.0, 3.0, 3.0], // Збільшуємо вдвічі більше
+  });
+  
+  // Додаємо ефект свічення навколо центральної карти
+  const centerGlow = addGlowEffect(centerCard, 0x996677, 0.4);
+  
+  // Створюємо багато карток в різних бардових відтінках
+  const card1 = makeCard({
+    color: 0x610028, // Темно-бардова
+    position: [40, 10, -10],
+    rotation: [0.5, 0.3, 0.2],
+    scale: [0.8, 0.8, 0.8],
+  });
+  const card2 = makeCard({
+    color: 0x7e0134, // Бардова
+    position: [-55, -12, 20],
+    rotation: [-0.3, 0.5, -0.2],
+    scale: [1.1, 1.1, 1.1],
+  });
+  const card3 = makeCard({
+    color: 0x48001e, // Темно-бардова
+    position: [5, -35, -35],
+    rotation: [0.2, -0.4, 0.3],
+    scale: [0.7, 0.7, 0.7],
+  });
+  const card4 = makeCard({
+    color: 0x990044, // Яскраво-бардова
+    position: [60, 30, 15],
+    rotation: [-0.5, 0.2, -0.3],
+    scale: [0.9, 0.9, 0.9],
+  });
+  const card5 = makeCard({
+    color: 0x5a0022, // Темно-бардова
+    position: [-40, 20, -30],
+    rotation: [0.4, -0.3, 0.1],
+    scale: [1.0, 1.0, 1.0],
+  });
+  
+  // Додаємо ще 10 карток
+  const card11 = makeCard({
+    color: 0x8e0038,
+    position: [-80, 60, -30],
+    rotation: [0.3, -0.2, 0.4],
+    scale: [0.85, 0.85, 0.85],
+  });
+  const card12 = makeCard({
+    color: 0x2a0014,
+    position: [30, 50, -50],
+    rotation: [-0.4, 0.3, -0.3],
+    scale: [0.95, 0.95, 0.95],
+  });
+  const card13 = makeCard({
+    color: 0xb8004f,
+    position: [-25, -60, 45],
+    rotation: [0.6, -0.5, 0.2],
+    scale: [0.75, 0.75, 0.75],
+  });
+  const card14 = makeCard({
+    color: 0x400018,
+    position: [85, 20, 40],
+    rotation: [-0.2, 0.6, -0.4],
+    scale: [1.05, 1.05, 1.05],
+  });
+  const card15 = makeCard({
+    color: 0x9e0049,
+    position: [-65, -30, 50],
+    rotation: [0.4, -0.3, 0.5],
+    scale: [0.88, 0.88, 0.88],
+  });
+  const card16 = makeCard({
+    color: 0x6a0024,
+    position: [20, 75, -20],
+    rotation: [-0.5, 0.4, -0.2],
+    scale: [0.92, 0.92, 0.92],
+  });
+  const card17 = makeCard({
+    color: 0x8a0036,
+    position: [-90, -15, 30],
+    rotation: [0.2, -0.4, 0.3],
+    scale: [0.82, 0.82, 0.82],
+  });
+  const card18 = makeCard({
+    color: 0x320012,
+    position: [45, -70, -45],
+    rotation: [-0.3, 0.5, -0.4],
+    scale: [0.78, 0.78, 0.78],
+  });
+  const card19 = makeCard({
+    color: 0xa20048,
+    position: [65, 65, 25],
+    rotation: [0.5, -0.3, 0.2],
+    scale: [0.86, 0.86, 0.86],
+  });
+  const card20 = makeCard({
+    color: 0x4a001c,
+    position: [-50, 80, -25],
+    rotation: [-0.4, 0.2, -0.5],
+    scale: [0.94, 0.94, 0.94],
+  });
+  
+  // Додаємо свічення до деяких карток
+  const cardGlows = [
+    addGlowEffect(card1, 0x610028, 0.2),
+    addGlowEffect(card2, 0x7e0134, 0.25),
+    addGlowEffect(card4, 0x990044, 0.3),
+    addGlowEffect(card13, 0xb8004f, 0.2),
+    addGlowEffect(card19, 0xa20048, 0.25),
+  ];
+  
+
+
+  function makePoints({ count, size, maxR, minR, texture }) {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const r = THREE.MathUtils.randFloat(minR, maxR);
+      const u = Math.random();
+      const v = Math.random();
+      const theta = 2 * Math.PI * u;
+      const phi = Math.acos(2 * v - 1);
+      positions[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+      size,
+      map: texture,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      opacity: 1.0,
+    });
+    return new THREE.Points(geo, mat);
+  }
+  const farStars = makePoints({
+    count: 220,
+    size: 0.7,
+    maxR: 130,
+    minR: 120,
+    texture: flare1,
+  });
+  const midDust = makePoints({
+    count: 600,
+    size: 2.5,
+    maxR: 35,
+    minR: 25,
+    texture: flare2,
+  });
+  
+  // Додаємо нові типи частинок для більш красивих ефектів
+  
+  // Близькі іскорки навколо головної карти
+  const closeSparkles = makePoints({
+    count: 150,
+    size: 1.2,
+    maxR: 15,
+    minR: 8,
+    texture: flare1,
+  });
+  
+  // Кільця з частинок навколо головної карти
+  const ring1 = makePoints({
+    count: 80,
+    size: 0.8,
+    maxR: 25,
+    minR: 24,
+    texture: flare2,
+  });
+  const ring2 = makePoints({
+    count: 60,
+    size: 1.0,
+    maxR: 45,
+    minR: 44,
+    texture: flare3,
+  });
+  
+  // Магічні частинки, що кружляють
+  const magicParticles = makePoints({
+    count: 100,
+    size: 1.5,
+    maxR: 60,
+    minR: 50,
+    texture: flare1,
+  });
+  
+  // Створюємо магічні смуги навколо головної карти
+  function createMagicRings() {
+    const rings = [];
+    for (let i = 0; i < 3; i++) {
+      const ring = makePoints({
+        count: 40 + i * 20,
+        size: 0.6 + i * 0.2,
+        maxR: 30 + i * 15,
+        minR: 28 + i * 15,
+        texture: i % 2 === 0 ? flare2 : flare3,
+      });
+      rings.push(ring);
+    }
+    return rings;
+  }
+  
+  const magicRings = createMagicRings();
+  
+  // Додаємо всі частинки до сцени
+  scene.add(farStars, midDust, closeSparkles, ring1, ring2, magicParticles, ...magicRings);
+
+  const comet = new THREE.Points(
+    new THREE.BufferGeometry().setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array([0, 0, 0]), 3)
+    ),
+    new THREE.PointsMaterial({
+      size: 16,
+      map: flare3,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      opacity: 0.9,
+    })
+  );
+  scene.add(comet);
+  let cometAngle = Math.random() * Math.PI * 2;
+  const cometRadius = 70;
+
+  // Функція для створення кубика (кости)
+  function makeDice(position, size = 1) {
+    const group = new THREE.Group();
+    
+    const diceGeo = new THREE.BoxGeometry(size * 6, size * 6, size * 6);
+    const diceMat = new THREE.MeshStandardMaterial({
+      color: 0xFFFFFF, // Білий колір
+      roughness: 0.4,
+      metalness: 0.3,
+      emissive: 0x222222,
+      emissiveIntensity: 0.1,
+    });
+    const dice = new THREE.Mesh(diceGeo, diceMat);
+    group.add(dice);
+    
+    // Додаємо чорні точки на кубику
+    const dotMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const positions = [
+      // 6 точок на різних гранях
+      [0, 0, 3.1], [-2, 0, 3.1], [2, 0, 3.1], [0, -2, 3.1], [0, 2, 3.1], [-1, 1, 3.1]
+    ];
+    positions.forEach(pos => {
+      const dot = new THREE.Mesh(
+        new THREE.SphereGeometry(size * 0.8, 16, 16),
+        dotMaterial
+      );
+      dot.position.set(...pos);
+      group.add(dot);
+    });
+    
+    group.position.set(...position);
+    scene.add(group);
+    return group;
+  }
+
+  // Функція для створення рулетки
+  function makeRoulette(position, size = 1) {
+    const group = new THREE.Group();
+    
+    // Основа рулетки
+    const rouletteGeo = new THREE.CylinderGeometry(size * 4, size * 4, size * 1, 32);
+    const rouletteMat = new THREE.MeshStandardMaterial({
+      color: 0xFFFFFF, // Білий колір
+      roughness: 0.5,
+      metalness: 0.7,
+      emissive: 0x222222,
+      emissiveIntensity: 0.1,
+    });
+    const roulette = new THREE.Mesh(rouletteGeo, rouletteMat);
+    roulette.rotation.x = Math.PI / 2;
+    group.add(roulette);
+    
+    // Додаємо білі та чорні сегменти
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const segmentGeo = new THREE.CylinderGeometry(size * 3.9, size * 3.9, size * 1.1, 4);
+      const segmentColor = i % 2 === 0 ? 0xFFFFFF : 0x000000;
+      const segmentMat = new THREE.MeshStandardMaterial({ color: segmentColor });
+      const segment = new THREE.Mesh(segmentGeo, segmentMat);
+      segment.rotation.x = Math.PI / 2;
+      segment.rotation.z = angle;
+      group.add(segment);
+    }
+    
+    group.position.set(...position);
+    scene.add(group);
+    return group;
+  }
+
+  // Функція для створення фішки (чипа)
+  function makeChip(position, size = 1, color = 0xFFFFFF) {
+    const group = new THREE.Group();
+    
+    // Основний циліндр фішки
+    const chipGeo = new THREE.CylinderGeometry(size * 3, size * 3, size * 0.8, 32);
+    const chipMat = new THREE.MeshStandardMaterial({
+      color: color,
+      roughness: 0.3,
+      metalness: 0.8,
+      emissive: color === 0x000000 ? 0x111111 : 0x333333,
+      emissiveIntensity: 0.2,
+    });
+    const chip = new THREE.Mesh(chipGeo, chipMat);
+    chip.rotation.x = Math.PI / 2;
+    group.add(chip);
+    
+    // Додаємо обідок
+    const rimGeo = new THREE.CylinderGeometry(size * 3.1, size * 3.1, size * 0.85, 32);
+    const rimMat = new THREE.MeshStandardMaterial({
+      color: color === 0xFFFFFF ? 0x000000 : 0xFFFFFF,
+      roughness: 0.2,
+      metalness: 0.9,
+    });
+    const rim = new THREE.Mesh(rimGeo, rimMat);
+    rim.rotation.x = Math.PI / 2;
+    group.add(rim);
+    
+    group.position.set(...position);
+    scene.add(group);
+    return group;
+  }
+
+  // Створюємо кубики, рулетки та фішки
+  const dices = [
+    makeDice([60, 40, -60], 0.8),
+    makeDice([-70, -50, 50], 0.9),
+    makeDice([80, -30, 40], 0.7),
+    makeDice([-40, 60, -50], 1.0),
+    makeDice([50, -60, 70], 0.85),
+    makeDice([-80, 30, 60], 0.75),
+  ];
+  
+  const roulettes = [
+    makeRoulette([70, -40, -70], 0.8),
+    makeRoulette([-60, 40, 70], 0.9),
+    makeRoulette([-80, -70, -30], 1.0),
+    makeRoulette([40, 70, -60], 0.85),
+  ];
+
+  // Створюємо фішки
+  const chips = [
+    makeChip([90, 20, -40], 0.6, 0xFFFFFF), // Білі фішки
+    makeChip([85, -35, 45], 0.7, 0x000000), // Чорні фішки
+    makeChip([-95, 25, 35], 0.65, 0xFFFFFF),
+    makeChip([-85, -45, -50], 0.75, 0x000000),
+    makeChip([45, 85, 55], 0.6, 0xFFFFFF),
+    makeChip([-50, 85, -60], 0.7, 0x000000),
+    makeChip([55, -90, 40], 0.65, 0xFFFFFF),
+    makeChip([-60, -95, -45], 0.75, 0x000000),
+  ];
+
+
+
+  const clock = new THREE.Clock();
+  function animate() {
+    const t = clock.getElapsedTime();
+
+    sky.rotation.y += 0.0008;
+    farStars.rotation.y -= 0.0006;
+    // Зірки крутяться різними швидкостями створюючи ефект руху
+    midDust.rotation.x -= 0.001;
+    midDust.rotation.z += 0.0008;
+    // Додатковий рух для далеких зірок
+    farStars.rotation.z -= 0.0003;
+    
+    // Ефект миготіння зірок (пульсація)
+    const twinkle = Math.sin(t * 2) * 0.3 + 0.7; // Від 0.4 до 1.0
+    farStars.material.opacity = twinkle;
+    midDust.material.opacity = twinkle * 0.8;
+    
+    // Анімація нових частинок
+    closeSparkles.rotation.y += 0.002;
+    closeSparkles.rotation.x += 0.001;
+    closeSparkles.material.opacity = Math.sin(t * 3) * 0.4 + 0.6;
+    
+    // Кільця обертаються з різними швидкостями
+    ring1.rotation.y += 0.003;
+    ring1.rotation.z += 0.001;
+    ring1.material.opacity = Math.sin(t * 1.5) * 0.3 + 0.7;
+    
+    ring2.rotation.y -= 0.002;
+    ring2.rotation.x += 0.002;
+    ring2.material.opacity = Math.sin(t * 2.2) * 0.4 + 0.6;
+    
+    // Магічні частинки кружляють
+    magicParticles.rotation.y += 0.0015;
+    magicParticles.rotation.x += 0.0008;
+    magicParticles.rotation.z += 0.0012;
+    magicParticles.material.opacity = Math.sin(t * 2.8) * 0.5 + 0.5;
+    
+    // Анімація ефектів свічення
+    centerGlow.material.opacity = Math.sin(t * 1.8) * 0.2 + 0.4;
+    centerGlow.rotation.y += 0.001;
+    centerGlow.rotation.x += 0.0005;
+    
+    // Анімація свічення карток
+    cardGlows.forEach((glow, i) => {
+      glow.material.opacity = Math.sin(t * (2 + i * 0.3)) * 0.15 + 0.2;
+      glow.rotation.y += 0.002 + i * 0.0005;
+      glow.rotation.x += 0.001 + i * 0.0003;
+    });
+    
+    // Анімація магічних смуг
+    magicRings.forEach((ring, i) => {
+      ring.rotation.y += 0.004 + i * 0.001;
+      ring.rotation.x += 0.002 + i * 0.0005;
+      ring.rotation.z += 0.001 + i * 0.0003;
+      ring.material.opacity = Math.sin(t * (1.5 + i * 0.5)) * 0.3 + 0.4;
+    });
+
+    // Всі картки залишаються на місці без руху
+    
+
+
+    cometAngle += (0.9 * Math.PI) / 180;
+    const cx = Math.cos(cometAngle) * cometRadius;
+    const cz = Math.sin(cometAngle) * cometRadius;
+    const cy = Math.sin(cometAngle * 0.8) * 18;
+    comet.position.set(cx, cy, cz);
+
+    // Анімація кубиків - обертання та рух
+    const diceBasePositions = [
+      [60, 40, -60], [-70, -50, 50], [80, -30, 40], 
+      [-40, 60, -50], [50, -60, 70], [-80, 30, 60]
+    ];
+    dices.forEach((dice, i) => {
+      const basePos = diceBasePositions[i];
+      const speed = 0.2 + i * 0.05;
+      const radius = 8 + i * 2;
+      
+      // Обертання кубика - симуляція кидання
+      dice.rotation.x += 0.015 + i * 0.003;
+      dice.rotation.y += 0.02 + i * 0.004;
+      dice.rotation.z += 0.01 + i * 0.002;
+      
+      // Рух у просторі
+      dice.position.x = basePos[0] + Math.cos(t * speed + i) * radius;
+      dice.position.y = basePos[1] + Math.sin(t * speed * 0.8 + i) * radius;
+      dice.position.z = basePos[2] + Math.cos(t * speed * 1.2 + i) * radius;
+    });
+
+    // Анімація рулеток - обертання та рух
+    const rouletteBasePositions = [
+      [70, -40, -70], [-60, 40, 70], [-80, -70, -30], [40, 70, -60]
+    ];
+    roulettes.forEach((roulette, i) => {
+      const basePos = rouletteBasePositions[i];
+      const speed = 0.15 + i * 0.04;
+      const radius = 10 + i * 3;
+      
+      // Обертання рулетки
+      roulette.rotation.z += 0.03 + i * 0.005;
+      
+      // Рух у просторі
+      roulette.position.x = basePos[0] + Math.cos(t * speed + i) * radius;
+      roulette.position.y = basePos[1] + Math.sin(t * speed * 0.9 + i) * radius;
+      roulette.position.z = basePos[2] + Math.cos(t * speed * 1.1 + i) * radius;
+    });
+
+    // Анімація фішок - обертання та рух
+    const chipBasePositions = [
+      [90, 20, -40], [85, -35, 45], [-95, 25, 35], [-85, -45, -50],
+      [45, 85, 55], [-50, 85, -60], [55, -90, 40], [-60, -95, -45]
+    ];
+    chips.forEach((chip, i) => {
+      const basePos = chipBasePositions[i];
+      const speed = 0.18 + i * 0.03;
+      const radius = 6 + i * 1.5;
+      
+      // Обертання фішки навколо власної осі
+      chip.rotation.z += 0.025 + i * 0.003;
+      
+      // Рух у просторі
+      chip.position.x = basePos[0] + Math.cos(t * speed + i) * radius;
+      chip.position.y = basePos[1] + Math.sin(t * speed * 0.9 + i) * radius;
+      chip.position.z = basePos[2] + Math.cos(t * speed * 1.1 + i) * radius;
+    });
+
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  const ro = new ResizeObserver(() => {
+    const w = container.clientWidth;
+    const h = container.clientHeight;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+  ro.observe(container);
   </script>
 </body>
 
