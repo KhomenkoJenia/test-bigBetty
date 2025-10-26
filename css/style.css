@@ -3493,11 +3493,12 @@ label.custom-checkbox a {
 .animated-pattern {
   animation: 13s linear 0s normal none infinite running rot;
   -webkit-animation: 13s linear 0s normal none infinite running rot;
+  transition: transform 0.6s ease-out;
 }
 
 .animated-pattern.speed-stop {
-  animation: none;
-  -webkit-animation: none;
+  animation-play-state: paused;
+  -webkit-animation-play-state: paused;
 }
 
 .main-image-bg-hero {
@@ -3519,13 +3520,14 @@ label.custom-checkbox a {
 .hero__main_image {
   cursor: pointer;
   position: absolute;
-  bottom: -45%;
-  left: 50%;
+  bottom: -36%;
+  left: 71%;
   width: 600px;
   z-index: 0;
   filter: drop-shadow(0 0 20px rgba(97, 0, 40, 0.5))
     drop-shadow(0 0 40px rgba(97, 0, 40, 0.3));
-  transition: filter 0.3s ease;
+  transition: filter 0.3s ease, transform 0.5s ease-out;
+  transform: translateX(-50%);
 }
 
 .hero__main_image:hover {

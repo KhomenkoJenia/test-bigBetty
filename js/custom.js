@@ -110,7 +110,10 @@ document.addEventListener("DOMContentLoaded", function () {
     heroMainImage.addEventListener("click", function () {
       if (isStopped) {
         // Відновити анімацію (видалити клас зупинки)
-        animatedPattern.classList.remove("speed-stop");
+        // Використовуємо requestAnimationFrame щоб дати час CSS transition спрацювати
+        requestAnimationFrame(() => {
+          animatedPattern.classList.remove("speed-stop");
+        });
         isStopped = false;
       } else {
         // Зупинити анімацію
