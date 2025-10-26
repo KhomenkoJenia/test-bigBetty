@@ -1431,6 +1431,105 @@
   );
   scene.add(sky);
 
+  // Функція для створення 3D логотипу з тексту
+  function makeLogo({ position = [0, 0, 0], rotation = [0, 0, 0], scale = [1, 1, 1] }) {
+    const group = new THREE.Group();
+    
+    // Створюємо Canvas для тексту логотипу
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 1024;
+    canvas.height = 1024;
+    
+    // Фон логотипу - бардовий градієнт
+    const gradient = context.createRadialGradient(512, 512, 0, 512, 512, 512);
+    gradient.addColorStop(0, '#996677');
+    gradient.addColorStop(0.7, '#610028');
+    gradient.addColorStop(1, '#2a0014');
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, 1024, 1024);
+    
+    // Додаємо тінь для тексту
+    context.fillStyle = '#000000';
+    context.font = 'bold 120px Arial';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('BIG', 512, 400);
+    context.fillText('BETTY', 512, 550);
+    
+    // Основний текст - білий з золотим відтінком
+    const textGradient = context.createLinearGradient(0, 350, 0, 600);
+    textGradient.addColorStop(0, '#FFD700');
+    textGradient.addColorStop(0.5, '#FFFFFF');
+    textGradient.addColorStop(1, '#FFD700');
+    context.fillStyle = textGradient;
+    context.fillText('BIG', 510, 398);
+    context.fillText('BETTY', 510, 548);
+    
+    // Додаємо декоративні елементи
+    context.strokeStyle = '#FFD700';
+    context.lineWidth = 8;
+    context.strokeRect(100, 200, 824, 624);
+    
+    // Створюємо текстуру з Canvas
+    const logoTexture = new THREE.CanvasTexture(canvas);
+    logoTexture.colorSpace = THREE.SRGBColorSpace;
+    logoTexture.needsUpdate = true;
+    
+    // Створюємо площину для логотипу
+    const logoGeometry = new THREE.PlaneGeometry(20, 20);
+    const logoMaterial = new THREE.MeshBasicMaterial({
+      map: logoTexture,
+      transparent: true,
+      side: THREE.DoubleSide,
+      opacity: 0.95,
+    });
+    const logoMesh = new THREE.Mesh(logoGeometry, logoMaterial);
+    group.add(logoMesh);
+    
+    // Додаємо логотип на зворотний бік
+    const backLogoMesh = new THREE.Mesh(logoGeometry, logoMaterial.clone());
+    backLogoMesh.rotation.y = Math.PI;
+    group.add(backLogoMesh);
+    
+    // Додаємо 3D рамку навколо логотипу
+    const frameGeometry = new THREE.BoxGeometry(22, 22, 1);
+    const frameMaterial = new THREE.MeshStandardMaterial({
+      color: 0x996677,
+      metalness: 0.8,
+      roughness: 0.2,
+      emissive: 0x996677,
+      emissiveIntensity: 0.1,
+    });
+    const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+    group.add(frame);
+    
+    // Додаємо золоті кути
+    const cornerGeometry = new THREE.BoxGeometry(2, 2, 1.2);
+    const cornerMaterial = new THREE.MeshStandardMaterial({
+      color: 0xFFD700,
+      metalness: 0.9,
+      roughness: 0.1,
+      emissive: 0xFFD700,
+      emissiveIntensity: 0.2,
+    });
+    
+    const corners = [
+      [-10, -10, 0.6], [10, -10, 0.6], [-10, 10, 0.6], [10, 10, 0.6]
+    ];
+    corners.forEach(pos => {
+      const corner = new THREE.Mesh(cornerGeometry, cornerMaterial);
+      corner.position.set(...pos);
+      group.add(corner);
+    });
+    
+    group.position.set(...position);
+    group.rotation.set(...rotation);
+    group.scale.set(...scale);
+    scene.add(group);
+    return group;
+  }
+
   // Функція для створення карток у бардових кольорах
   function makeCard({ color, position = [0, 0, 0], rotation = [0, 0, 0], showText = false, scale = [1, 1, 1] }) {
     const group = new THREE.Group();
@@ -1467,19 +1566,25 @@
     
     // Додаємо тінь для кращої видимості
     context.fillStyle = '#000000';
-    const fontSize = showText ? 80 : 60; // Більший шрифт для центральної
+    const fontSize = showText ? 120 : 60; // Значно більший шрифт для центральної
     context.font = `bold ${fontSize}px Arial`;
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    const yPos1 = showText ? 185 : 200;
-    const yPos2 = showText ? 285 : 290;
+    const yPos1 = showText ? 200 : 200;
+    const yPos2 = showText ? 320 : 290;
     context.fillText('BIG', 260, yPos1);
     context.fillText('BETTY', 260, yPos2);
     
-    // Білий текст
+    // Білий текст (яскравіший)
     context.fillStyle = '#ffffff';
-    context.fillText('BIG', showText ? 258 : 259, showText ? 183 : 199);
-    context.fillText('BETTY', showText ? 258 : 259, showText ? 283 : 289);
+    context.fillText('BIG', showText ? 258 : 259, showText ? 198 : 199);
+    context.fillText('BETTY', showText ? 258 : 259, showText ? 318 : 289);
+    
+    // Додаємо білий контур для кращої видимості
+    context.strokeStyle = '#ffffff';
+    context.lineWidth = 2;
+    context.strokeText('BIG', showText ? 258 : 259, showText ? 198 : 199);
+    context.strokeText('BETTY', showText ? 258 : 259, showText ? 318 : 289);
     
     const textTexture = new THREE.CanvasTexture(textCanvas);
     textTexture.needsUpdate = true;
@@ -1521,119 +1626,588 @@
     return glow;
   }
 
-  // Центральна картка з текстом "BIG BETTY" - чорна і збільшена вдвічі
+  // Центральна картка з чорним фоном та білим текстом "BIG BETTY"
   const centerCard = makeCard({
-    color: 0x000000, // Чорна
+    color: 0x000000, // Чорний фон
     position: [0, 0, 0],
     rotation: [0, 0, 0],
     showText: true,
-    scale: [3.0, 3.0, 3.0], // Збільшуємо вдвічі більше
+    scale: [4.0, 4.0, 4.0], // Збільшуємо розмір
   });
   
-  // Додаємо ефект свічення навколо центральної карти
-  const centerGlow = addGlowEffect(centerCard, 0x996677, 0.4);
+  // Прибираємо всі інші картки, залишаємо тільки головну
   
-  // Створюємо багато карток в різних бардових відтінках
-  const card1 = makeCard({
-    color: 0x610028, // Темно-бардова
-    position: [40, 10, -10],
-    rotation: [0.5, 0.3, 0.2],
-    scale: [0.8, 0.8, 0.8],
-  });
-  const card2 = makeCard({
-    color: 0x7e0134, // Бардова
-    position: [-55, -12, 20],
-    rotation: [-0.3, 0.5, -0.2],
-    scale: [1.1, 1.1, 1.1],
-  });
-  const card3 = makeCard({
-    color: 0x48001e, // Темно-бардова
-    position: [5, -35, -35],
-    rotation: [0.2, -0.4, 0.3],
-    scale: [0.7, 0.7, 0.7],
-  });
-  const card4 = makeCard({
-    color: 0x990044, // Яскраво-бардова
-    position: [60, 30, 15],
-    rotation: [-0.5, 0.2, -0.3],
-    scale: [0.9, 0.9, 0.9],
-  });
-  const card5 = makeCard({
-    color: 0x5a0022, // Темно-бардова
-    position: [-40, 20, -30],
-    rotation: [0.4, -0.3, 0.1],
-    scale: [1.0, 1.0, 1.0],
-  });
+  // Прибираємо ефекти свічення з карток
   
-  // Додаємо ще 10 карток
-  const card11 = makeCard({
-    color: 0x8e0038,
-    position: [-80, 60, -30],
-    rotation: [0.3, -0.2, 0.4],
-    scale: [0.85, 0.85, 0.85],
-  });
-  const card12 = makeCard({
-    color: 0x2a0014,
-    position: [30, 50, -50],
-    rotation: [-0.4, 0.3, -0.3],
-    scale: [0.95, 0.95, 0.95],
-  });
-  const card13 = makeCard({
-    color: 0xb8004f,
-    position: [-25, -60, 45],
-    rotation: [0.6, -0.5, 0.2],
-    scale: [0.75, 0.75, 0.75],
-  });
-  const card14 = makeCard({
-    color: 0x400018,
-    position: [85, 20, 40],
-    rotation: [-0.2, 0.6, -0.4],
-    scale: [1.05, 1.05, 1.05],
-  });
-  const card15 = makeCard({
-    color: 0x9e0049,
-    position: [-65, -30, 50],
-    rotation: [0.4, -0.3, 0.5],
-    scale: [0.88, 0.88, 0.88],
-  });
-  const card16 = makeCard({
-    color: 0x6a0024,
-    position: [20, 75, -20],
-    rotation: [-0.5, 0.4, -0.2],
-    scale: [0.92, 0.92, 0.92],
-  });
-  const card17 = makeCard({
-    color: 0x8a0036,
-    position: [-90, -15, 30],
-    rotation: [0.2, -0.4, 0.3],
-    scale: [0.82, 0.82, 0.82],
-  });
-  const card18 = makeCard({
-    color: 0x320012,
-    position: [45, -70, -45],
-    rotation: [-0.3, 0.5, -0.4],
-    scale: [0.78, 0.78, 0.78],
-  });
-  const card19 = makeCard({
-    color: 0xa20048,
-    position: [65, 65, 25],
-    rotation: [0.5, -0.3, 0.2],
-    scale: [0.86, 0.86, 0.86],
-  });
-  const card20 = makeCard({
-    color: 0x4a001c,
-    position: [-50, 80, -25],
-    rotation: [-0.4, 0.2, -0.5],
-    scale: [0.94, 0.94, 0.94],
-  });
+  // Функція для створення сердечок
+  function makeHeart(position, size = 1) {
+    const group = new THREE.Group();
+    
+    // Створюємо форму серця з геометрії
+    const heartShape = new THREE.Shape();
+    const x = 0, y = 0;
+    heartShape.moveTo(x + 5, y + 5);
+    heartShape.bezierCurveTo(x + 5, y + 5, x + 4, y, x, y);
+    heartShape.bezierCurveTo(x - 6, y, x - 6, y + 3.5, x - 6, y + 3.5);
+    heartShape.bezierCurveTo(x - 6, y + 5.5, x - 4, y + 7.7, x, y + 10);
+    heartShape.bezierCurveTo(x + 4, y + 7.7, x + 6, y + 5.5, x + 6, y + 3.5);
+    heartShape.bezierCurveTo(x + 6, y + 3.5, x + 6, y, x, y);
+    
+    const heartGeometry = new THREE.ExtrudeGeometry(heartShape, {
+      depth: 0.5,
+      bevelEnabled: true,
+      bevelThickness: 0.1,
+      bevelSize: 0.1,
+      bevelOffset: 0,
+      bevelSegments: 3
+    });
+    
+    const heartMaterial = new THREE.MeshStandardMaterial({
+      color: 0xFF69B4, // Рожевий колір
+      metalness: 0.3,
+      roughness: 0.4,
+      emissive: 0xFF1493,
+      emissiveIntensity: 0.2,
+    });
+    
+    const heart = new THREE.Mesh(heartGeometry, heartMaterial);
+    heart.scale.set(size, size, size);
+    group.add(heart);
+    
+    group.position.set(...position);
+    scene.add(group);
+    return group;
+  }
   
-  // Додаємо свічення до деяких карток
-  const cardGlows = [
-    addGlowEffect(card1, 0x610028, 0.2),
-    addGlowEffect(card2, 0x7e0134, 0.25),
-    addGlowEffect(card4, 0x990044, 0.3),
-    addGlowEffect(card13, 0xb8004f, 0.2),
-    addGlowEffect(card19, 0xa20048, 0.25),
+  // Створюємо сердечка навколо сцени
+  const hearts = [
+    makeHeart([30, 20, -20], 0.8),
+    makeHeart([-40, 15, 25], 1.0),
+    makeHeart([50, -25, -30], 0.7),
+    makeHeart([-25, -40, 40], 0.9),
+    makeHeart([60, 35, 15], 0.6),
+    makeHeart([-60, -20, -35], 1.1),
+    makeHeart([20, 50, -45], 0.8),
+    makeHeart([-45, 60, 20], 0.9),
+    makeHeart([35, -60, 30], 0.7),
+    makeHeart([-30, 30, -50], 1.0),
+  ];
+  
+  // Функція для створення чорних дір
+  function makeBlackHole(position, size = 1) {
+    const group = new THREE.Group();
+    
+    // Основа чорної діри - чорна сфера
+    const holeGeometry = new THREE.SphereGeometry(size * 3, 32, 32);
+    const holeMaterial = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const hole = new THREE.Mesh(holeGeometry, holeMaterial);
+    group.add(hole);
+    
+    // Ефект горизонту подій - кільце навколо діри (бардово-чорне)
+    const horizonGeometry = new THREE.RingGeometry(size * 2.5, size * 3.5, 64);
+    const horizonMaterial = new THREE.MeshBasicMaterial({
+      color: 0x7e0134, // #7e0134
+      transparent: true,
+      opacity: 0.2, // Більш прозорий
+      side: THREE.DoubleSide,
+    });
+    const horizon = new THREE.Mesh(horizonGeometry, horizonMaterial);
+    horizon.rotation.x = Math.PI / 2;
+    group.add(horizon);
+    
+    // Енергетичне кільце - зовнішнє (темно-бардове)
+    const energyGeometry = new THREE.RingGeometry(size * 4, size * 5, 64);
+    const energyMaterial = new THREE.MeshBasicMaterial({
+      color: 0x7e0134, // #7e0134
+      transparent: true,
+      opacity: 0.15, // Більш прозорий
+      side: THREE.DoubleSide,
+    });
+    const energy = new THREE.Mesh(energyGeometry, energyMaterial);
+    energy.rotation.x = Math.PI / 2;
+    group.add(energy);
+    
+    // Частинки, що закручуються в діру
+    const particleGeometry = new THREE.BufferGeometry();
+    const particleCount = 200;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (i / particleCount) * Math.PI * 2;
+      const radius = size * 6 + Math.random() * size * 2;
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * size * 2;
+      positions[i * 3 + 2] = Math.sin(angle) * radius;
+    }
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0x7e0134, // #7e0134
+      size: 0.08, // Менший розмір
+      transparent: true,
+      opacity: 0.3, // Більш прозорий
+    });
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    group.add(particles);
+    
+    group.position.set(...position);
+    scene.add(group);
+    return { group, particles, horizon, energy };
+  }
+  
+  // Створюємо менше чорних дір (зменшено з 10 до 5)
+  const blackHoles = [
+    makeBlackHole([80, 40, -60], 1.2), // Менший розмір
+    makeBlackHole([-90, -30, 70], 1.0),
+    makeBlackHole([70, -80, -40], 1.4),
+    makeBlackHole([-60, 70, 50], 0.8),
+    makeBlackHole([120, 20, -80], 1.5),
+  ];
+  
+  // Функція для створення магічних порталів
+  function makePortal(position, size = 1) {
+    const group = new THREE.Group();
+    
+    // Основа порталу - кільце (бардово-чорне)
+    const portalGeometry = new THREE.RingGeometry(size * 2, size * 3, 64);
+    const portalMaterial = new THREE.MeshBasicMaterial({
+      color: 0x7e0134, // #7e0134
+      transparent: true,
+      opacity: 0.3, // Більш прозорий
+      side: THREE.DoubleSide,
+    });
+    const portal = new THREE.Mesh(portalGeometry, portalMaterial);
+    group.add(portal);
+    
+    // Внутрішня частина порталу - темна
+    const innerGeometry = new THREE.RingGeometry(0, size * 2, 64);
+    const innerMaterial = new THREE.MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      opacity: 0.9,
+      side: THREE.DoubleSide,
+    });
+    const inner = new THREE.Mesh(innerGeometry, innerMaterial);
+    group.add(inner);
+    
+    // Енергетичні спалахи навколо порталу
+    const sparkGeometry = new THREE.BufferGeometry();
+    const sparkCount = 50;
+    const sparkPositions = new Float32Array(sparkCount * 3);
+    for (let i = 0; i < sparkCount; i++) {
+      const angle = (i / sparkCount) * Math.PI * 2;
+      const radius = size * 3.5 + Math.random() * size;
+      sparkPositions[i * 3] = Math.cos(angle) * radius;
+      sparkPositions[i * 3 + 1] = (Math.random() - 0.5) * size * 0.5;
+      sparkPositions[i * 3 + 2] = Math.sin(angle) * radius;
+    }
+    sparkGeometry.setAttribute('position', new THREE.BufferAttribute(sparkPositions, 3));
+    
+    const sparkMaterial = new THREE.PointsMaterial({
+      color: 0x7e0134, // #7e0134
+      size: 0.15, // Менший розмір
+      transparent: true,
+      opacity: 0.4, // Більш прозорий
+    });
+    const sparks = new THREE.Points(sparkGeometry, sparkMaterial);
+    group.add(sparks);
+    
+    // Енергетичні кільця (бардово-чорні)
+    for (let i = 0; i < 3; i++) {
+      const ringGeometry = new THREE.RingGeometry(size * 3.5 + i * 0.5, size * 4 + i * 0.5, 64);
+      const ringMaterial = new THREE.MeshBasicMaterial({
+        color: 0x7e0134, // #7e0134
+        transparent: true,
+        opacity: 0.1 - i * 0.03, // Більш прозорий
+        side: THREE.DoubleSide,
+      });
+      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      group.add(ring);
+    }
+    
+    group.position.set(...position);
+    scene.add(group);
+    return { group, sparks, portal, inner };
+  }
+  
+  // Створюємо менше порталів (зменшено з 10 до 4)
+  const portals = [
+    makePortal([-80, 50, -80], 1.5), // Менший розмір
+    makePortal([90, -60, 60], 1.2),
+    makePortal([-50, -90, -70], 1.4),
+    makePortal([60, 90, -30], 1.0),
+  ];
+  
+  // Функція для створення магічних сфер
+  function makeMagicSphere(position, size = 1, color = 0xFF00FF) {
+    const group = new THREE.Group();
+    
+    // Основа сфери
+    const sphereGeometry = new THREE.SphereGeometry(size * 2, 32, 32);
+    const sphereMaterial = new THREE.MeshStandardMaterial({
+      color: color,
+      metalness: 0.8,
+      roughness: 0.2,
+      emissive: color,
+      emissiveIntensity: 0.3,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    group.add(sphere);
+    
+    // Енергетичні кільця навколо сфери
+    for (let i = 0; i < 4; i++) {
+      const ringGeometry = new THREE.RingGeometry(size * 2.2 + i * 0.3, size * 2.5 + i * 0.3, 32);
+      const ringMaterial = new THREE.MeshBasicMaterial({
+        color: new THREE.Color().setHSL((color / 0xFFFFFF) + i * 0.1, 1, 0.6),
+        transparent: true,
+        opacity: 0.6 - i * 0.1,
+        side: THREE.DoubleSide,
+      });
+      const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+      ring.rotation.x = Math.PI / 2;
+      ring.rotation.y = i * Math.PI / 4;
+      group.add(ring);
+    }
+    
+    // Частинки енергії навколо сфери
+    const energyGeometry = new THREE.BufferGeometry();
+    const energyCount = 100;
+    const energyPositions = new Float32Array(energyCount * 3);
+    for (let i = 0; i < energyCount; i++) {
+      const phi = Math.acos(2 * Math.random() - 1);
+      const theta = 2 * Math.PI * Math.random();
+      const radius = size * 3 + Math.random() * size;
+      energyPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      energyPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      energyPositions[i * 3 + 2] = radius * Math.cos(phi);
+    }
+    energyGeometry.setAttribute('position', new THREE.BufferAttribute(energyPositions, 3));
+    
+    const energyMaterial = new THREE.PointsMaterial({
+      color: color,
+      size: 0.3,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const energy = new THREE.Points(energyGeometry, energyMaterial);
+    group.add(energy);
+    
+    group.position.set(...position);
+    scene.add(group);
+    return { group, sphere, energy };
+  }
+  
+  // Створюємо менше магічних сфер (всі #7e0134)
+  const magicSpheres = [
+    makeMagicSphere([100, 30, -50], 1.2, 0x7e0134), // #7e0134, менший розмір
+    makeMagicSphere([-100, -40, 80], 1.0, 0x7e0134),
+    makeMagicSphere([50, 100, -80], 1.4, 0x7e0134),
+    makeMagicSphere([-70, -100, -60], 0.8, 0x7e0134),
+    makeMagicSphere([120, -80, 40], 1.1, 0x7e0134),
+    makeMagicSphere([130, 50, -90], 1.3, 0x7e0134),
+  ];
+  
+  // Функція для створення північного сяйва
+  function createAurora() {
+    const group = new THREE.Group();
+    
+    // Створюємо кілька круглих смуг північного сяйва
+    for (let i = 0; i < 6; i++) {
+      const auroraGeometry = new THREE.RingGeometry(60 + i * 20, 80 + i * 20, 64);
+      
+      // Створюємо градієнт для північного сяйва (бардово-чорний)
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = 256;
+      canvas.height = 256;
+      
+      // Створюємо радіальний градієнт
+      const gradient = context.createRadialGradient(128, 128, 0, 128, 128, 128);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0)'); // Прозорий центр
+      gradient.addColorStop(0.3, 'rgba(97, 0, 40, 0.3)'); // Темно-бардовий
+      gradient.addColorStop(0.5, 'rgba(126, 1, 52, 0.6)'); // Бардовий
+      gradient.addColorStop(0.7, 'rgba(153, 0, 68, 0.8)'); // Яскраво-бардовий
+      gradient.addColorStop(0.9, 'rgba(42, 0, 20, 0.9)'); // Темно-бардовий
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.7)'); // Чорний край
+      
+      context.fillStyle = gradient;
+      context.fillRect(0, 0, 256, 256);
+      
+      const auroraTexture = new THREE.CanvasTexture(canvas);
+      auroraTexture.colorSpace = THREE.SRGBColorSpace;
+      
+      const auroraMaterial = new THREE.MeshBasicMaterial({
+        map: auroraTexture,
+        transparent: true,
+        opacity: 0.8,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+      });
+      
+      const aurora = new THREE.Mesh(auroraGeometry, auroraMaterial);
+      aurora.position.y = 60 + i * 8; // Розташовуємо кільця на різних висотах
+      aurora.position.x = Math.sin(i * 0.8) * 30; // Хвилястий розподіл
+      aurora.position.z = Math.cos(i * 0.8) * 30; // Кругове розташування
+      aurora.rotation.x = Math.PI / 2;
+      aurora.rotation.z = Math.sin(i * 0.5) * 0.5; // Легкий нахил
+      
+      group.add(aurora);
+    }
+    
+    // Додаємо частинки північного сяйва (кругле розташування)
+    const particleGeometry = new THREE.BufferGeometry();
+    const particleCount = 1200;
+    const positions = new Float32Array(particleCount * 3);
+    const colors = new Float32Array(particleCount * 3);
+    
+    for (let i = 0; i < particleCount; i++) {
+      // Розташовуємо частинки в круглій смузі північного сяйва
+      const angle = Math.random() * Math.PI * 2;
+      const radius = 60 + Math.random() * 120; // Від 60 до 180
+      const height = 60 + Math.random() * 50; // Висота
+      
+      positions[i * 3] = Math.cos(angle) * radius; // X
+      positions[i * 3 + 1] = height; // Y (висота)
+      positions[i * 3 + 2] = Math.sin(angle) * radius; // Z
+      
+      // Бардово-чорні кольори
+      const colorChoice = Math.random();
+      if (colorChoice < 0.3) {
+        colors[i * 3] = 0.38; // R (97/255)
+        colors[i * 3 + 1] = 0; // G
+        colors[i * 3 + 2] = 0.16; // B (40/255)
+      } else if (colorChoice < 0.6) {
+        colors[i * 3] = 0.49; // R (126/255)
+        colors[i * 3 + 1] = 0; // G
+        colors[i * 3 + 2] = 0.2; // B (52/255)
+      } else if (colorChoice < 0.8) {
+        colors[i * 3] = 0.6; // R (153/255)
+        colors[i * 3 + 1] = 0; // G
+        colors[i * 3 + 2] = 0.27; // B (68/255)
+      } else {
+        colors[i * 3] = 0.16; // R (42/255)
+        colors[i * 3 + 1] = 0; // G
+        colors[i * 3 + 2] = 0.08; // B (20/255)
+      }
+    }
+    
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    
+    const particleMaterial = new THREE.PointsMaterial({
+      size: 0.5,
+      transparent: true,
+      opacity: 0.8,
+      vertexColors: true,
+      blending: THREE.AdditiveBlending,
+    });
+    
+    const auroraParticles = new THREE.Points(particleGeometry, particleMaterial);
+    group.add(auroraParticles);
+    
+    scene.add(group);
+    return { group, auroraParticles };
+  }
+  
+  // Створюємо північне сяйво
+  const aurora = createAurora();
+  
+  // Функція для створення салюту
+  function createFireworks() {
+    const group = new THREE.Group();
+    
+    // Створюємо менше салютів навколо головної карти (зменшено з 8 до 4)
+    for (let i = 0; i < 4; i++) {
+      const angle = (i / 4) * Math.PI * 2;
+      const radius = 25 + Math.random() * 15; // Відстань від головної карти
+      const height = 20 + Math.random() * 30; // Висота салюту
+      
+      const fireworkGroup = new THREE.Group();
+      
+      // Основа салюту - сфера
+      const fireworkGeometry = new THREE.SphereGeometry(0.5, 16, 16);
+      const fireworkMaterial = new THREE.MeshBasicMaterial({
+        color: 0x7e0134, // #7e0134
+        transparent: true,
+        opacity: 0.6, // Більш прозорий
+      });
+      const firework = new THREE.Mesh(fireworkGeometry, fireworkMaterial);
+      fireworkGroup.add(firework);
+      
+      // Частинки салюту
+      const particleGeometry = new THREE.BufferGeometry();
+      const particleCount = 50;
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+      
+      for (let j = 0; j < particleCount; j++) {
+        // Розташовуємо частинки в сфері
+        const phi = Math.acos(2 * Math.random() - 1);
+        const theta = 2 * Math.PI * Math.random();
+        const particleRadius = 2 + Math.random() * 3;
+        
+        positions[j * 3] = particleRadius * Math.sin(phi) * Math.cos(theta);
+        positions[j * 3 + 1] = particleRadius * Math.sin(phi) * Math.sin(theta);
+        positions[j * 3 + 2] = particleRadius * Math.cos(phi);
+        
+        // Всі частинки #7e0134
+        colors[j * 3] = 0.49; // R (126/255)
+        colors[j * 3 + 1] = 0; // G
+        colors[j * 3 + 2] = 0.2; // B (52/255)
+      }
+      
+      particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      particleGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      
+      const particleMaterial = new THREE.PointsMaterial({
+        size: 0.2, // Менший розмір
+        transparent: true,
+        opacity: 0.6, // Більш прозорий
+        vertexColors: true,
+        blending: THREE.AdditiveBlending,
+      });
+      
+      const particles = new THREE.Points(particleGeometry, particleMaterial);
+      fireworkGroup.add(particles);
+      
+      // Позиціонуємо салют навколо головної карти
+      fireworkGroup.position.x = Math.cos(angle) * radius;
+      fireworkGroup.position.y = height;
+      fireworkGroup.position.z = Math.sin(angle) * radius;
+      
+      group.add(fireworkGroup);
+    }
+    
+    scene.add(group);
+    return { group };
+  }
+  
+  // Створюємо салют
+  const fireworks = createFireworks();
+  
+  // Функція для створення енергетичних хвиль
+  function makeEnergyWave(position, size = 1) {
+    const group = new THREE.Group();
+    
+    // Створюємо кілька хвиль (бардово-чорні)
+    for (let i = 0; i < 5; i++) {
+      const waveGeometry = new THREE.RingGeometry(size * 10 + i * 5, size * 12 + i * 5, 64);
+      const waveMaterial = new THREE.MeshBasicMaterial({
+        color: 0x7e0134, // #7e0134
+        transparent: true,
+        opacity: 0.15 - i * 0.03, // Більш прозорий
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
+      });
+      const wave = new THREE.Mesh(waveGeometry, waveMaterial);
+      wave.rotation.x = Math.PI / 2;
+      wave.position.y = i * 2;
+      group.add(wave);
+    }
+    
+    // Додаємо енергетичні частинки
+    const particleGeometry = new THREE.BufferGeometry();
+    const particleCount = 200;
+    const positions = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = size * 15 + Math.random() * size * 10;
+      positions[i * 3] = Math.cos(angle) * radius;
+      positions[i * 3 + 1] = Math.random() * size * 10;
+      positions[i * 3 + 2] = Math.sin(angle) * radius;
+    }
+    particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    
+    const particleMaterial = new THREE.PointsMaterial({
+      color: 0x7e0134, // #7e0134
+      size: 0.2, // Менший розмір
+      transparent: true,
+      opacity: 0.3, // Більш прозорий
+    });
+    const particles = new THREE.Points(particleGeometry, particleMaterial);
+    group.add(particles);
+    
+    group.position.set(...position);
+    scene.add(group);
+    return { group, particles };
+  }
+  
+  // Функція для створення магічних кристалів
+  function makeCrystal(position, size = 1) {
+    const group = new THREE.Group();
+    
+    // Основа кристала - октаедр
+    const crystalGeometry = new THREE.OctahedronGeometry(size * 3);
+    const crystalMaterial = new THREE.MeshStandardMaterial({
+      color: 0x996677,
+      metalness: 0.9,
+      roughness: 0.1,
+      emissive: 0x996677,
+      emissiveIntensity: 0.3,
+      transparent: true,
+      opacity: 0.8,
+    });
+    const crystal = new THREE.Mesh(crystalGeometry, crystalMaterial);
+    group.add(crystal);
+    
+    // Енергетичне поле навколо кристала
+    const fieldGeometry = new THREE.SphereGeometry(size * 5, 32, 32);
+    const fieldMaterial = new THREE.MeshBasicMaterial({
+      color: 0x996677,
+      transparent: true,
+      opacity: 0.1,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+    });
+    const field = new THREE.Mesh(fieldGeometry, fieldMaterial);
+    group.add(field);
+    
+    // Частинки енергії
+    const energyGeometry = new THREE.BufferGeometry();
+    const energyCount = 100;
+    const energyPositions = new Float32Array(energyCount * 3);
+    for (let i = 0; i < energyCount; i++) {
+      const phi = Math.acos(2 * Math.random() - 1);
+      const theta = 2 * Math.PI * Math.random();
+      const radius = size * 4 + Math.random() * size * 2;
+      energyPositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      energyPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      energyPositions[i * 3 + 2] = radius * Math.cos(phi);
+    }
+    energyGeometry.setAttribute('position', new THREE.BufferAttribute(energyPositions, 3));
+    
+    const energyMaterial = new THREE.PointsMaterial({
+      color: 0x996677,
+      size: 0.2,
+      transparent: true,
+      opacity: 0.9,
+    });
+    const energy = new THREE.Points(energyGeometry, energyMaterial);
+    group.add(energy);
+    
+    group.position.set(...position);
+    scene.add(group);
+    return { group, crystal, energy };
+  }
+  
+  // Створюємо менше енергетичних хвиль (зменшено з 6 до 3)
+  const energyWaves = [
+    makeEnergyWave([60, 20, -70], 1.2), // Менший розмір
+    makeEnergyWave([-70, -30, 80], 1.0),
+    makeEnergyWave([90, 60, -90], 1.4),
+  ];
+  
+  // Створюємо менше магічних кристалів (зменшено з 8 до 4)
+  const crystals = [
+    makeCrystal([70, 40, -80], 1.0), // Менший розмір
+    makeCrystal([-80, -50, 90], 1.2),
+    makeCrystal([100, 80, -60], 0.8),
+    makeCrystal([-60, -90, -70], 1.1),
   ];
   
 
@@ -1688,21 +2262,7 @@
     texture: flare1,
   });
   
-  // Кільця з частинок навколо головної карти
-  const ring1 = makePoints({
-    count: 80,
-    size: 0.8,
-    maxR: 25,
-    minR: 24,
-    texture: flare2,
-  });
-  const ring2 = makePoints({
-    count: 60,
-    size: 1.0,
-    maxR: 45,
-    minR: 44,
-    texture: flare3,
-  });
+  // Прибираємо кільця з частинок
   
   // Магічні частинки, що кружляють
   const magicParticles = makePoints({
@@ -1713,26 +2273,10 @@
     texture: flare1,
   });
   
-  // Створюємо магічні смуги навколо головної карти
-  function createMagicRings() {
-    const rings = [];
-    for (let i = 0; i < 3; i++) {
-      const ring = makePoints({
-        count: 40 + i * 20,
-        size: 0.6 + i * 0.2,
-        maxR: 30 + i * 15,
-        minR: 28 + i * 15,
-        texture: i % 2 === 0 ? flare2 : flare3,
-      });
-      rings.push(ring);
-    }
-    return rings;
-  }
-  
-  const magicRings = createMagicRings();
+  // Прибираємо магічні смуги
   
   // Додаємо всі частинки до сцени
-  scene.add(farStars, midDust, closeSparkles, ring1, ring2, magicParticles, ...magicRings);
+  scene.add(farStars, midDust, closeSparkles, magicParticles);
 
   const comet = new THREE.Points(
     new THREE.BufferGeometry().setAttribute(
@@ -1907,14 +2451,7 @@
     closeSparkles.rotation.x += 0.001;
     closeSparkles.material.opacity = Math.sin(t * 3) * 0.4 + 0.6;
     
-    // Кільця обертаються з різними швидкостями
-    ring1.rotation.y += 0.003;
-    ring1.rotation.z += 0.001;
-    ring1.material.opacity = Math.sin(t * 1.5) * 0.3 + 0.7;
-    
-    ring2.rotation.y -= 0.002;
-    ring2.rotation.x += 0.002;
-    ring2.material.opacity = Math.sin(t * 2.2) * 0.4 + 0.6;
+    // Прибираємо анімацію кіл
     
     // Магічні частинки кружляють
     magicParticles.rotation.y += 0.0015;
@@ -1922,24 +2459,239 @@
     magicParticles.rotation.z += 0.0012;
     magicParticles.material.opacity = Math.sin(t * 2.8) * 0.5 + 0.5;
     
-    // Анімація ефектів свічення
-    centerGlow.material.opacity = Math.sin(t * 1.8) * 0.2 + 0.4;
-    centerGlow.rotation.y += 0.001;
-    centerGlow.rotation.x += 0.0005;
+    // Прибираємо анімацію ефектів свічення
     
-    // Анімація свічення карток
-    cardGlows.forEach((glow, i) => {
-      glow.material.opacity = Math.sin(t * (2 + i * 0.3)) * 0.15 + 0.2;
-      glow.rotation.y += 0.002 + i * 0.0005;
-      glow.rotation.x += 0.001 + i * 0.0003;
+    // Прибираємо анімацію свічення карток
+    
+    // Прибираємо анімацію магічних смуг
+
+    // Центральна картка залишається нерухомою
+    
+    // Анімація сердечок - плаваючий рух
+    hearts.forEach((heart, i) => {
+      const speed = 0.1 + i * 0.02;
+      const radius = 3 + i * 0.5;
+      heart.position.x += Math.sin(t * speed + i) * 0.02;
+      heart.position.y += Math.cos(t * speed * 0.8 + i) * 0.015;
+      heart.position.z += Math.sin(t * speed * 1.2 + i) * 0.01;
+      
+      // Обертання сердечок
+      heart.rotation.x += 0.01 + i * 0.002;
+      heart.rotation.y += 0.008 + i * 0.001;
+      heart.rotation.z += 0.005 + i * 0.001;
+      
+      // Пульсація
+      const scale = 1 + Math.sin(t * 2 + i) * 0.1;
+      heart.scale.setScalar(scale);
     });
     
-    // Анімація магічних смуг
-    magicRings.forEach((ring, i) => {
-      ring.rotation.y += 0.004 + i * 0.001;
-      ring.rotation.x += 0.002 + i * 0.0005;
-      ring.rotation.z += 0.001 + i * 0.0003;
-      ring.material.opacity = Math.sin(t * (1.5 + i * 0.5)) * 0.3 + 0.4;
+    // Анімація чорних дір
+    blackHoles.forEach((hole, i) => {
+      // Обертання горизонту подій
+      hole.horizon.rotation.z += 0.02 + i * 0.005;
+      hole.energy.rotation.z -= 0.015 + i * 0.003;
+      
+      // Закручування частинок
+      const positions = hole.particles.geometry.attributes.position.array;
+      for (let j = 0; j < positions.length; j += 3) {
+        const angle = Math.atan2(positions[j + 2], positions[j]) + 0.01;
+        const radius = Math.sqrt(positions[j] ** 2 + positions[j + 2] ** 2);
+        positions[j] = Math.cos(angle) * radius;
+        positions[j + 2] = Math.sin(angle) * radius;
+        positions[j + 1] *= 0.999; // Поступово затягуємо в діру
+      }
+      hole.particles.geometry.attributes.position.needsUpdate = true;
+    });
+    
+    // Анімація порталів
+    portals.forEach((portal, i) => {
+      // Обертання порталу
+      portal.group.rotation.z += 0.03 + i * 0.005;
+      
+      // Обертання спалахів
+      portal.sparks.rotation.y += 0.05 + i * 0.01;
+      portal.sparks.rotation.x += 0.02 + i * 0.003;
+      
+      // Пульсація порталу
+      const scale = 1 + Math.sin(t * 3 + i) * 0.1;
+      portal.portal.scale.setScalar(scale);
+    });
+    
+    // Анімація магічних сфер
+    magicSpheres.forEach((sphere, i) => {
+      // Обертання сфери
+      sphere.group.rotation.x += 0.01 + i * 0.002;
+      sphere.group.rotation.y += 0.015 + i * 0.003;
+      sphere.group.rotation.z += 0.008 + i * 0.001;
+      
+      // Пульсація сфери
+      const scale = 1 + Math.sin(t * 2.5 + i) * 0.15;
+      sphere.sphere.scale.setScalar(scale);
+      
+      // Обертання енергетичних кіл
+      sphere.group.children.forEach((child, j) => {
+        if (child.geometry.type === 'RingGeometry') {
+          child.rotation.z += 0.02 + j * 0.005;
+        }
+      });
+      
+      // Рух енергетичних частинок
+      const positions = sphere.energy.geometry.attributes.position.array;
+      for (let j = 0; j < positions.length; j += 3) {
+        const phi = Math.acos(positions[j + 2] / Math.sqrt(positions[j] ** 2 + positions[j + 1] ** 2 + positions[j + 2] ** 2));
+        const theta = Math.atan2(positions[j + 1], positions[j]) + 0.02;
+        const radius = Math.sqrt(positions[j] ** 2 + positions[j + 1] ** 2 + positions[j + 2] ** 2);
+        positions[j] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[j + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      }
+      sphere.energy.geometry.attributes.position.needsUpdate = true;
+    });
+    
+    // Анімація північного сяйва (кругле)
+    aurora.group.children.forEach((child, i) => {
+      if (child.geometry.type === 'RingGeometry') {
+        // Круговий рух кіл північного сяйва
+        const angle = t * 0.2 + i * 0.3;
+        child.position.x = Math.sin(angle) * 40;
+        child.position.z = Math.cos(angle) * 40;
+        child.position.y = 60 + i * 8 + Math.sin(t * 0.4 + i * 0.2) * 3;
+        
+        // Обертання кіл
+        child.rotation.z += 0.01 + i * 0.002;
+        
+        // Пульсація прозорості
+        child.material.opacity = 0.8 + Math.sin(t * 1.5 + i * 0.3) * 0.2;
+        
+        // Пульсація розміру
+        const scale = 1 + Math.sin(t * 2 + i * 0.4) * 0.1;
+        child.scale.setScalar(scale);
+      }
+    });
+    
+    // Анімація частинок північного сяйва (кругле)
+    const positions = aurora.auroraParticles.geometry.attributes.position.array;
+    for (let i = 0; i < positions.length; i += 3) {
+      // Зберігаємо початкові координати для розрахунку
+      const originalX = positions[i];
+      const originalZ = positions[i + 2];
+      const radius = Math.sqrt(originalX * originalX + originalZ * originalZ);
+      const angle = Math.atan2(originalZ, originalX);
+      
+      // Круговий рух частинок
+      const newAngle = angle + 0.005 + (i % 100) * 0.0001;
+      positions[i] = Math.cos(newAngle) * radius;
+      positions[i + 2] = Math.sin(newAngle) * radius;
+      
+      // Вертикальний хвилястий рух
+      positions[i + 1] += Math.sin(t * 0.3 + i * 0.01) * 0.02;
+      
+      // Обмежуємо рух частинок в круглій зоні
+      const currentRadius = Math.sqrt(positions[i] * positions[i] + positions[i + 2] * positions[i + 2]);
+      if (currentRadius > 180) {
+        const normalizeAngle = Math.atan2(positions[i + 2], positions[i]);
+        positions[i] = Math.cos(normalizeAngle) * 180;
+        positions[i + 2] = Math.sin(normalizeAngle) * 180;
+      }
+      if (currentRadius < 60) {
+        const normalizeAngle = Math.atan2(positions[i + 2], positions[i]);
+        positions[i] = Math.cos(normalizeAngle) * 60;
+        positions[i + 2] = Math.sin(normalizeAngle) * 60;
+      }
+      
+      // Обмежуємо висоту
+      if (positions[i + 1] > 110) positions[i + 1] = 60;
+      if (positions[i + 1] < 60) positions[i + 1] = 110;
+    }
+    aurora.auroraParticles.geometry.attributes.position.needsUpdate = true;
+    
+    // Анімація енергетичних хвиль
+    energyWaves.forEach((wave, i) => {
+      // Обертання хвиль
+      wave.group.rotation.y += 0.02 + i * 0.005;
+      wave.group.rotation.x += 0.01 + i * 0.003;
+      
+      // Пульсація хвиль
+      const scale = 1 + Math.sin(t * 1.5 + i * 0.3) * 0.2;
+      wave.group.scale.setScalar(scale);
+      
+      // Рух частинок
+      const positions = wave.particles.geometry.attributes.position.array;
+      for (let j = 0; j < positions.length; j += 3) {
+        const angle = Math.atan2(positions[j + 2], positions[j]) + 0.01;
+        const radius = Math.sqrt(positions[j] ** 2 + positions[j + 2] ** 2);
+        positions[j] = Math.cos(angle) * radius;
+        positions[j + 2] = Math.sin(angle) * radius;
+        positions[j + 1] += Math.sin(t * 2 + j * 0.01) * 0.05;
+      }
+      wave.particles.geometry.attributes.position.needsUpdate = true;
+    });
+    
+    // Анімація магічних кристалів
+    crystals.forEach((crystal, i) => {
+      // Обертання кристала
+      crystal.group.rotation.x += 0.015 + i * 0.002;
+      crystal.group.rotation.y += 0.02 + i * 0.003;
+      crystal.group.rotation.z += 0.01 + i * 0.001;
+      
+      // Пульсація кристала
+      const scale = 1 + Math.sin(t * 2.2 + i * 0.4) * 0.15;
+      crystal.crystal.scale.setScalar(scale);
+      
+      // Пульсація енергетичного поля
+      const fieldScale = 1 + Math.sin(t * 1.8 + i * 0.3) * 0.3;
+      crystal.group.children.forEach(child => {
+        if (child.geometry.type === 'SphereGeometry') {
+          child.scale.setScalar(fieldScale);
+        }
+      });
+      
+      // Рух енергетичних частинок
+      const positions = crystal.energy.geometry.attributes.position.array;
+      for (let j = 0; j < positions.length; j += 3) {
+        const phi = Math.acos(positions[j + 2] / Math.sqrt(positions[j] ** 2 + positions[j + 1] ** 2 + positions[j + 2] ** 2));
+        const theta = Math.atan2(positions[j + 1], positions[j]) + 0.02;
+        const radius = Math.sqrt(positions[j] ** 2 + positions[j + 1] ** 2 + positions[j + 2] ** 2);
+        positions[j] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[j + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        positions[j + 2] = radius * Math.cos(phi);
+      }
+      crystal.energy.geometry.attributes.position.needsUpdate = true;
+    });
+    
+    // Анімація салюту
+    fireworks.group.children.forEach((fireworkGroup, i) => {
+      // Обертання салюту
+      fireworkGroup.rotation.x += 0.02 + i * 0.005;
+      fireworkGroup.rotation.y += 0.03 + i * 0.003;
+      fireworkGroup.rotation.z += 0.01 + i * 0.002;
+      
+      // Пульсація салюту
+      const scale = 1 + Math.sin(t * 3 + i * 0.5) * 0.3;
+      fireworkGroup.scale.setScalar(scale);
+      
+      // Рух частинок салюту
+      const particles = fireworkGroup.children[1]; // Частинки - другий елемент
+      if (particles && particles.geometry.attributes.position) {
+        const positions = particles.geometry.attributes.position.array;
+        for (let j = 0; j < positions.length; j += 3) {
+          // Розширення частинок (ефект вибуху)
+          const expansion = 1 + Math.sin(t * 2 + j * 0.01) * 0.5;
+          positions[j] *= expansion;
+          positions[j + 1] *= expansion;
+          positions[j + 2] *= expansion;
+          
+          // Додатковий рух
+          positions[j] += Math.sin(t * 1.5 + j * 0.02) * 0.1;
+          positions[j + 1] += Math.cos(t * 1.8 + j * 0.015) * 0.1;
+          positions[j + 2] += Math.sin(t * 2.2 + j * 0.025) * 0.1;
+        }
+        particles.geometry.attributes.position.needsUpdate = true;
+      }
+      
+      // Пульсація прозорості
+      if (particles && particles.material) {
+        particles.material.opacity = 0.8 + Math.sin(t * 2.5 + i * 0.3) * 0.2;
+      }
     });
 
     // Всі картки залишаються на місці без руху
